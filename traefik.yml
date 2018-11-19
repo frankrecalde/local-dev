@@ -1,0 +1,43 @@
+version: '2'
+
+services:
+  traefik:
+    image: traefik
+    restart: unless-stopped
+    #command: -c /dev/null --web --docker --logLevel=DEBUG
+    command: -c /dev/null --web --docker --logLevel=INFO --defaultEntryPoints='https' --entryPoints="Name:https Address::443 TLS:/certs/cert.pem,/certs/key.pem" --entryPoints="Name:http Address::8024 Redirect.EntryPoint:https"
+    networks:
+      - project1
+      - project6
+    ports:
+      - '8024:80'
+      - '443:443'
+      - '8080:8080'
+    volumes:
+      - ../certs:/certs/
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  #portainer:
+  #  image: portainer/portainer
+  #  restart: unless-stopped
+  #  networks:
+  #    - project1
+  #    - project2
+  #    - project3
+  #    - project4
+  #  command: --no-auth -H unix:///var/run/docker.sock
+  #  volumes:
+  #    - '/var/run/docker.sock:/var/run/docker.sock'
+  #  labels:
+  #    - traefik.backend=portainer
+  #    - traefik.port=9000
+  #    - 'traefik.frontend.rule=Host:portainer.localhost'
+
+networks:
+  project1:
+    external:
+      name: dva_default
+  project6:
+    external:
+      name: iproject_default
+
